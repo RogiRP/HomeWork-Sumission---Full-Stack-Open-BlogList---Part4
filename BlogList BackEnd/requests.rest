@@ -13,3 +13,17 @@ Content-Type: application/json
 
 ###
 GET http://localhost:3003/api/blogs
+
+###
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Blog actualizado por modulos",
+  "author": "Roger",
+  "url": "http://roronoa.com",
+  "likes": 5
+}
+
+###
+GET http://localhost:3003/api/blogs
