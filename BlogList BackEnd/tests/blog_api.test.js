@@ -88,4 +88,20 @@ describe('blog api', () => {
     assert.ok(titles.includes('Third blog'))
   })
 
+  test('blog without likes defaults to 0', async () => {
+    const newBlog = {
+        title: 'Blog without likes',
+        author: 'Roger',
+        url: 'test.com'
+    }
+
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+
+    assert.strictEqual(response.body.likes, 0)
+    
+  })
+
 })
