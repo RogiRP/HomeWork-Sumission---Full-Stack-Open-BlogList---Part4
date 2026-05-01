@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const Blog = require('./models/blog')
+const usersRouter = require('./controllers/users')
 
 app.use(cors())
 app.use(express.json())
@@ -50,5 +51,7 @@ app.put('/api/blogs/:id', async (request, response) => {
     response.status(400).json({ error: error.message })
   }
 })
+
+app.use('/api/users', usersRouter)
 
 module.exports = app

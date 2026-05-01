@@ -7,13 +7,15 @@
     "dev": "nodemon index.js",
     "test": "cross-env NODE_ENV=test node --test",
     "test:api": "cross-env NODE_ENV=test node --test tests/blog_api.test.js",
-  "test:list": "cross-env NODE_ENV=test node --test tests/list_helper.test.js"
+    "test:list": "cross-env NODE_ENV=test node --test tests/list_helper.test.js",
+    "test:users": "cross-env NODE_ENV=test node --test tests/users_api.test.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
