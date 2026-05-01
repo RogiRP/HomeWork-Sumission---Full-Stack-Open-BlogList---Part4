@@ -41,3 +41,19 @@ Content-Type: application/json
 ### Lista usuarios
 GET http://localhost:3003/api/users
 
+### Crear un blog
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+{
+  "title": "Blog con usuario",
+  "author": "Roger",
+  "url": "test.com",
+  "likes": 5
+}
+
+### Ver blogs 
+GET http://localhost:3003/api/blogs
+
+### Ver usuarios
+GET http://localhost:3003/api/users
