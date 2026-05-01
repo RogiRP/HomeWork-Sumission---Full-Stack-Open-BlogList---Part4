@@ -97,4 +97,39 @@ describe('user creation', () => {
     assert.ok(response.body.error.includes('at least 3 characters'))
   })
 
+  test('fails with 400 if username is missing', async () => {
+  const userWithoutUsername = {
+    name: 'No Username',
+    password: 'password123'
+  }
+
+  const response = await api
+    .post('/api/users')
+    .send(userWithoutUsername)
+    .expect(400)
+
+  assert.ok(response.body.error.includes('username is required'))
+
+  const usersAtEnd = await api.get('/api/users')
+  assert.strictEqual(usersAtEnd.body.length, 1)
+})
+
+test('fails with 400 if username is too short', async () => {
+  const userWithShortUsername = {
+    username: 'ab',   // menos de 3 caracteres
+    name: 'Short Username',
+    password: 'password123'
+  }
+
+  const response = await api
+    .post('/api/users')
+    .send(userWithShortUsername)
+    .expect(400)
+
+  assert.ok(response.body.error.includes('username must be at least 3 characters'))
+
+  const usersAtEnd = await api.get('/api/users')
+  assert.strictEqual(usersAtEnd.body.length, 1)
+})
+
 })
