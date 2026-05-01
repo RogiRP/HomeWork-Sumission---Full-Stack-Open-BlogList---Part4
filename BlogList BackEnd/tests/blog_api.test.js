@@ -101,7 +101,38 @@ describe('blog api', () => {
         .expect(201)
 
     assert.strictEqual(response.body.likes, 0)
-    
+
   })
 
+  test('blog without title is not added and returns 400', async () => {
+    const blogWithoutTitle = {
+        author: 'Roger',
+        url: 'test.com',
+        likes: 5
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(blogWithoutTitle)
+        .expect(400)
+        
+    const response = await api.get('/api/blogs')
+    assert.strictEqual(response.body.length, initialBlogs.length)
+    })
+
+  test('blog without url is not added and returns 400', async () => {
+    const blogWithoutUrl = {
+        title: 'Blog without url',
+        author: 'Roger',
+        likes: 5
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(blogWithoutUrl)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+    assert.strictEqual(response.body.length, initialBlogs.length)
+    })
 })
