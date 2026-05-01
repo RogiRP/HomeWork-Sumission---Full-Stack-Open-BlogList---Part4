@@ -8,7 +8,8 @@
     "test": "cross-env NODE_ENV=test node --test --test-concurrency=1",
     "test:api": "cross-env NODE_ENV=test node --test tests/blog_api.test.js",
     "test:list": "cross-env NODE_ENV=test node --test tests/list_helper.test.js",
-    "test:users": "cross-env NODE_ENV=test node --test tests/users_api.test.js"
+    "test:users": "cross-env NODE_ENV=test node --test tests/users_api.test.js",
+    "test:login": "cross-env NODE_ENV=test node --test tests/login_api.test.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +21,7 @@
     "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.1"
   },
   "devDependencies": {

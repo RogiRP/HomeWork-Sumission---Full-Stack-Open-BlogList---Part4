@@ -4,9 +4,22 @@ const cors = require('cors')
 const Blog = require('./models/blog')
 const usersRouter = require('./controllers/users')
 const User = require('./models/user')
+const loginRouter = require('./controllers/login')
+const jwt = require('jsonwebtoken')
 
 app.use(cors())
 app.use(express.json())
+
+const getTokenFrom = (request) => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')){
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
+
+app.use('/api/login', loginRouter)
+app.use('/api/login', usersRouter)
 
 app.get('/api/blogs', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {username: 1, name: 1})
@@ -14,7 +27,20 @@ app.get('/api/blogs', async (request, response) => {
 })
 
 app.post('/api/blogs', async (request, response) => {
-  const user = await User.findOne({})
+  const token = getTokenFrom(request)
+
+  let decodedToken
+  try{
+    decodedToken = jwt.verify(token, process.env.SECRET)
+  } catch {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  
+  const user = await User.findById(decodedToken.id)
   
   const blog = new Blog({...request.body, user: user._id})
   try{
@@ -59,6 +85,5 @@ app.put('/api/blogs/:id', async (request, response) => {
   }
 })
 
-app.use('/api/users', usersRouter)
 
 module.exports = app
