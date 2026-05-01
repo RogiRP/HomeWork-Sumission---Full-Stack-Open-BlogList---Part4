@@ -163,3 +163,31 @@ describe('deletion of a blog', () => {
   })
 
 })
+
+describe('updating a blog', () => {
+
+  test('succeeds updating likes with status 200', async () => {
+    const blogsAtStart = await api.get('/api/blogs')
+    const blogToUpdate = blogsAtStart.body[0]
+
+    const updatedData = { likes: 999 }
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(updatedData)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    assert.strictEqual(response.body.likes, 999)
+  })
+
+  test('fails with status 404 if blog does not exist', async () => {
+    const nonExistingId = '000000000000000000000000'
+
+    await api
+      .put(`/api/blogs/${nonExistingId}`)
+      .send({ likes: 999 })
+      .expect(404)
+  })
+
+})
