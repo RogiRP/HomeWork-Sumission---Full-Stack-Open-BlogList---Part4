@@ -139,3 +139,75 @@ describe('creating a blog with authentication', () => {
   })
 
 })
+
+
+describe('deletion of a blog', () => {
+
+  const loginAndGetToken = async () => {
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'RogiRP', password: 'secreto123' })
+    return response.body.token
+  }
+
+  test('succeeds if token belongs to creator', async () => {
+    const token = await loginAndGetToken()
+
+    const newBlog = {
+      title: 'Blog a eliminar',
+      author: 'Roger',
+      url: 'test.com',
+      likes: 1
+    }
+
+    const created = await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send(newBlog)
+      .expect(201)
+
+    await api
+      .delete(`/api/blogs/${created.body.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .expect(204)
+  })
+
+  test('fails with 401 if token is missing', async () => {
+    const token = await loginAndGetToken()
+
+    const created = await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ title: 'Blog', author: 'Roger', url: 'test.com' })
+      .expect(201)
+
+    await api
+      .delete(`/api/blogs/${created.body.id}`)
+      .expect(401)
+  })
+
+  test('fails with 403 if token belongs to wrong user', async () => {
+    await api
+      .post('/api/users')
+      .send({ username: 'otro', name: 'Otro', password: 'password123' })
+
+    const creatorToken = await loginAndGetToken()  
+
+    const created = await api
+      .post('/api/blogs')
+      .set('Authorization', `Bearer ${creatorToken}`)
+      .send({ title: 'Blog de RogiRP', author: 'Roger', url: 'test.com' })
+      .expect(201)
+
+    const otherResponse = await api
+      .post('/api/login')
+      .send({ username: 'otro', password: 'password123' })
+    const otherToken = otherResponse.body.token
+
+    await api
+      .delete(`/api/blogs/${created.body.id}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .expect(403)
+  })
+
+})
