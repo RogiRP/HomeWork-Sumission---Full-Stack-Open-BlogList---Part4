@@ -115,7 +115,7 @@ describe('blog api', () => {
         .post('/api/blogs')
         .send(blogWithoutTitle)
         .expect(400)
-        
+
     const response = await api.get('/api/blogs')
     assert.strictEqual(response.body.length, initialBlogs.length)
     })
@@ -135,4 +135,31 @@ describe('blog api', () => {
     const response = await api.get('/api/blogs')
     assert.strictEqual(response.body.length, initialBlogs.length)
     })
+})
+
+describe('deletion of a blog', () => {
+
+  test('succeeds with status 204 if id is valid', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+    const blogToDelete = blogsAtStart.body[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(204)
+
+    const blogsAtEnd = await api.get('/api/blogs')
+    assert.strictEqual(blogsAtEnd.body.length, initialBlogs.length - 1)
+
+    const titles = blogsAtEnd.body.map(b => b.title)
+    assert.ok(!titles.includes(blogToDelete.title))
+  })
+
+  test('fails with status 404 if blog does not exist', async () => {
+    const nonExistingId = '000000000000000000000000'
+
+    await api
+      .delete(`/api/blogs/${nonExistingId}`)
+      .expect(404)
+  })
+
 })

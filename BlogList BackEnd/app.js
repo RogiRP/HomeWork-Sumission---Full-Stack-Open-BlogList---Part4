@@ -22,4 +22,15 @@ app.post('/api/blogs', async (request, response) => {
   
 })
 
+app.delete('/api/blogs/:id', async(request, response) => {
+  const result = await Blog.findByIdAndDelete(request.params.id)
+
+  if (!result) { 
+    return response.status(404).json({error: 'blog not found'})
+  }
+
+  response.status(204).end()
+  
+})
+
 module.exports = app
