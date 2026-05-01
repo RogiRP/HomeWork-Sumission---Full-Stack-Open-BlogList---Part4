@@ -67,4 +67,25 @@ describe('blog api', () => {
     assert.strictEqual(blog._id, undefined)
   })
 
+  test('a valid blog can be added', async () => {
+    const newBlog = {
+        title: 'Third blog',
+        author: 'Roger',
+        url: 'Roronoa.com',
+        likes: 3
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    assert.strictEqual(response.body.length, initialBlogs.length + 1)
+
+    const titles = response.body.map(b => b.title)
+    assert.ok(titles.includes('Third blog'))
+  })
+
 })
