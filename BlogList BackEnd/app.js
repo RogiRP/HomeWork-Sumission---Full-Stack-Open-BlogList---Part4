@@ -6,9 +6,12 @@ const usersRouter = require('./controllers/users')
 const User = require('./models/user')
 const loginRouter = require('./controllers/login')
 const jwt = require('jsonwebtoken')
+const middleware = require('./utils/middleware')
 
 app.use(cors())
 app.use(express.json())
+app.use(middleware.tokenExtractor)
+
 
 const getTokenFrom = (request) => {
   const authorization = request.get('authorization')
@@ -19,7 +22,7 @@ const getTokenFrom = (request) => {
 }
 
 app.use('/api/login', loginRouter)
-app.use('/api/login', usersRouter)
+app.use('/api/users', usersRouter)
 
 app.get('/api/blogs', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {username: 1, name: 1})
@@ -27,11 +30,10 @@ app.get('/api/blogs', async (request, response) => {
 })
 
 app.post('/api/blogs', async (request, response) => {
-  const token = getTokenFrom(request)
 
   let decodedToken
   try{
-    decodedToken = jwt.verify(token, process.env.SECRET)
+    decodedToken = jwt.verify(request.token, process.env.SECRET)
   } catch {
     return response.status(401).json({ error: 'token invalid' })
   }
