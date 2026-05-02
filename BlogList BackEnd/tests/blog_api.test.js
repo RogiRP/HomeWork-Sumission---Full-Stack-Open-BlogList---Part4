@@ -1,3 +1,5 @@
+//Autentificacion resuelta anteriormente
+
 require('dotenv').config()
 
 const { test, describe, beforeEach, before, after } = require('node:test')
