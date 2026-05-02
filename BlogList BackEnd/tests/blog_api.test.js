@@ -6,6 +6,10 @@ const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
+const User = require('../models/user')
+
+let token
 
 const api = supertest(app)
 
@@ -30,11 +34,22 @@ before(async () => {
 
 beforeEach(async () => {
     await Blog.deleteMany({})
+    await User.deleteMany({})
+    
+    const passwordHash = await bcrypt.hash('password123', 10)
+    const user = new User({ username: 'testuser', name: 'Test User', passwordHash })
+    await user.save()
 
-    let blogObject = new Blog(initialBlogs[0])
+    const response = await api
+      .post('/api/login')
+      .send({ username: 'testuser', password: 'password123' })
+    token = response.body.token
+
+
+    let blogObject = new Blog({ ...initialBlogs[0], user: user._id })
     await blogObject.save()
 
-    blogObject = new Blog(initialBlogs[1])
+    blogObject = new Blog({ ...initialBlogs[1], user: user._id })
     await blogObject.save()
 })
 
@@ -77,6 +92,7 @@ describe('blog api', () => {
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -97,6 +113,7 @@ describe('blog api', () => {
 
     const response = await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
 
@@ -113,6 +130,7 @@ describe('blog api', () => {
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(blogWithoutTitle)
         .expect(400)
 
@@ -129,6 +147,7 @@ describe('blog api', () => {
 
     await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(blogWithoutUrl)
         .expect(400)
 
@@ -145,6 +164,7 @@ describe('deletion of a blog', () => {
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(204)
 
     const blogsAtEnd = await api.get('/api/blogs')
@@ -159,6 +179,7 @@ describe('deletion of a blog', () => {
 
     await api
       .delete(`/api/blogs/${nonExistingId}`)
+      .set('Authorization', `Bearer ${token}`)
       .expect(404)
   })
 
