@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
 
 const blog = {
@@ -18,4 +19,15 @@ test('renders title and author but not url or likes by default', () => {
   expect(screen.getByText('Test Blog Title Test Author', { exact: false })).toBeVisible()
   expect(screen.queryByText('http://testurl.com')).not.toBeInTheDocument()
   expect(screen.queryByText('likes 5', { exact: false })).not.toBeInTheDocument()
+})
+
+test('shows url and likes when view button is clicked', async () => {
+  render(<Blog blog={blog} />)
+
+  const user = userEvent.setup()
+  const button = screen.getByText('view')
+  await user.click(button)
+
+  expect(screen.getByText('http://testurl.com')).toBeVisible()
+  expect(screen.getByText('likes 5', { exact: false })).toBeVisible()
 })
