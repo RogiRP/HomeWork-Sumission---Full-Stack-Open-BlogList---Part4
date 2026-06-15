@@ -9,9 +9,10 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [title, setTitle] = useState('')      // ← nuevo
-  const [author, setAuthor] = useState('')    // ← nuevo
-  const [url, setUrl] = useState('')          // ← nuevo
+  const [title, setTitle] = useState('')      
+  const [author, setAuthor] = useState('')    
+  const [url, setUrl] = useState('')          
+  const [successMessage, setSuccessMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogs(blogs))
@@ -22,7 +23,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      blogService.setToken(user.token)  // ← restaurar token al recargar
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -31,10 +32,12 @@ const App = () => {
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
-      blogService.setToken(user.token)  // ← configurar token al hacer login
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
+      setSuccessMessage(`Welcome ${user.name}`)
+      setTimeout(() => setSuccessMessage(null), 5000)
     } catch (exception) {
       setErrorMessage('wrong username or password')
       setTimeout(() => setErrorMessage(null), 5000)
@@ -43,7 +46,7 @@ const App = () => {
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBlogUser')
-    blogService.setToken(null)  // ← limpiar token al hacer logout
+    blogService.setToken(null)
     setUser(null)
   }
 
@@ -52,10 +55,12 @@ const App = () => {
     try {
       const newBlog = { title, author, url }
       const createdBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(createdBlog))  // actualizar lista sin recargar
+      setBlogs(blogs.concat(createdBlog)) 
       setTitle('')
       setAuthor('')
       setUrl('')
+      setSuccessMessage(`a new blog ${createdBlog.title} by ${createdBlog.author} added`)
+      setTimeout(() => setSuccessMessage(null), 5000)
     } catch (exception) {
       setErrorMessage('Error creating blog')
       setTimeout(() => setErrorMessage(null), 5000)
@@ -66,6 +71,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}  {/* ← aquí */}
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <form onSubmit={handleLogin}>
           <div>
@@ -85,6 +91,9 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}  {/* ← aquí */}
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}        {/* ← aquí */}
+
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
