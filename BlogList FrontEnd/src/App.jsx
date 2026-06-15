@@ -13,6 +13,7 @@ const App = () => {
   const [author, setAuthor] = useState('')    
   const [url, setUrl] = useState('')          
   const [successMessage, setSuccessMessage] = useState(null)
+  const [formVisible, setFormVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs => setBlogs(blogs))
@@ -59,6 +60,7 @@ const App = () => {
       setTitle('')
       setAuthor('')
       setUrl('')
+      setFormVisible(false) 
       setSuccessMessage(`a new blog ${createdBlog.title} by ${createdBlog.author} added`)
       setTimeout(() => setSuccessMessage(null), 5000)
     } catch (exception) {
@@ -100,21 +102,28 @@ const App = () => {
       </p>
 
       <h2>create new</h2>
-      <form onSubmit={handleCreate}>
-        <div>
-          title
-          <input type="text" value={title} onChange={({ target }) => setTitle(target.value)} />
-        </div>
-        <div>
-          author
-          <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)} />
-        </div>
-        <div>
-          url
-          <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} />
-        </div>
-        <button type="submit">create</button>
-      </form>
+
+      {formVisible
+        ? <div>
+            <form onSubmit={handleCreate}>
+              <div>
+                title
+                <input type="text" value={title} onChange={({ target }) => setTitle(target.value)} />
+              </div>
+              <div>
+                author
+                <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)} />
+              </div>
+              <div>
+                url
+                <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} />
+              </div>
+              <button type="submit">create</button>
+              <button type="button" onClick={() => setFormVisible(false)}>cancel</button>
+            </form>
+          </div>
+        : <button onClick={() => setFormVisible(true)}>create new blog</button>
+      }
 
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
