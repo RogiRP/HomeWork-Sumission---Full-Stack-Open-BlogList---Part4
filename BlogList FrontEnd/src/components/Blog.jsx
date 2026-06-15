@@ -15,15 +15,15 @@ const Blog = ({ blog, onLike, onDelete, currentUser }) => {
     currentUser.username === blog.user.username
 
   return (
-    <div style={blogStyle}>
-      <div>
+    <div style={blogStyle} className="blog">
+      <div className="blog-summary">
         {blog.title} {blog.author}
         <button onClick={() => setVisible(!visible)}>
           {visible ? 'hide' : 'view'}
         </button>
       </div>
       {visible && (
-        <div>
+        <div className="blog-details">
           <p>{blog.url}</p>
           <p>
             likes {blog.likes}
