@@ -48,20 +48,21 @@ router.delete('/:id', async (request, response) => {
 })
 
 router.put('/:id', async (request, response) => {
-    try{
-        const updatedBlog = await Blog.findByIdAndUpdate(
-            request.params.id,
-            request.body,
-            {returnDocument: 'after'}
-        )
-        if (!updatedBlog) {
-            return response.status(404).json({error: 'blog not found'})
-        }
+  try {
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      request.body,
+      { returnDocument: 'after' }
+    ).populate('user', { username: 1, name: 1 })
 
-        response.json(updatedBlog)
-    } catch {
-        response.status(400).json({error: error.message})
+    if (!updatedBlog) {
+      return response.status(404).json({ error: 'blog not found' })
     }
+
+    response.json(updatedBlog)
+  } catch (error) {
+    response.status(400).json({ error: error.message })
+  }
 })
 
 module.exports = router

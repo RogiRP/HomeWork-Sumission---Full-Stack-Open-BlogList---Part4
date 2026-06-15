@@ -49,7 +49,6 @@ const App = () => {
     setUser(null)
   }
 
-  // Esta función se pasa a BlogForm como prop
   const handleCreate = async (newBlog) => {
     try {
       const createdBlog = await blogService.create(newBlog)
@@ -61,6 +60,19 @@ const App = () => {
       setErrorMessage('Error creating blog')
       setTimeout(() => setErrorMessage(null), 5000)
     }
+  }
+
+  const handleLike = async (blog) => {
+  const updatedBlog = {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1,
+      user: blog.user ? blog.user.id : null
+    }
+
+    const returnedBlog = await blogService.update(blog.id, updatedBlog)
+    setBlogs(blogs.map(b => b.id === returnedBlog.id ? returnedBlog : b))
   }
 
   if (user === null) {
@@ -103,7 +115,7 @@ const App = () => {
       }
 
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} onLike={handleLike} />
       )}
     </div>
   )
