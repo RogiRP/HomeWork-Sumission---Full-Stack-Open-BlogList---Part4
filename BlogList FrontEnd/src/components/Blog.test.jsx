@@ -31,3 +31,19 @@ test('shows url and likes when view button is clicked', async () => {
   expect(screen.getByText('http://testurl.com')).toBeVisible()
   expect(screen.getByText('likes 5', { exact: false })).toBeVisible()
 })
+
+test('calls like handler twice when like button is clicked twice', async () => {
+  const mockLike = vi.fn()
+
+  render(<Blog blog={blog} onLike={mockLike} />)
+
+  const user = userEvent.setup()
+
+  await user.click(screen.getByText('view'))
+
+  const likeButton = screen.getByText('like')
+  await user.click(likeButton)
+  await user.click(likeButton)
+
+  expect(mockLike).toHaveBeenCalledTimes(2)
+})
