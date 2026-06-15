@@ -114,7 +114,7 @@ const App = () => {
         : <button onClick={() => setFormVisible(true)}>create new blog</button>
       }
 
-      {blogs.map(blog =>
+      {[...blogs].sort((a, b) => b.likes - a.likes).map(blog =>
         <Blog key={blog.id} blog={blog} onLike={handleLike} />
       )}
     </div>
