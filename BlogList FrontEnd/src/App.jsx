@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -9,9 +10,6 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState(null)
-  const [title, setTitle] = useState('')      
-  const [author, setAuthor] = useState('')    
-  const [url, setUrl] = useState('')          
   const [successMessage, setSuccessMessage] = useState(null)
   const [formVisible, setFormVisible] = useState(false)
 
@@ -51,16 +49,12 @@ const App = () => {
     setUser(null)
   }
 
-  const handleCreate = async (event) => {
-    event.preventDefault()
+  // Esta función se pasa a BlogForm como prop
+  const handleCreate = async (newBlog) => {
     try {
-      const newBlog = { title, author, url }
       const createdBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(createdBlog)) 
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      setFormVisible(false) 
+      setBlogs(blogs.concat(createdBlog))
+      setFormVisible(false)
       setSuccessMessage(`a new blog ${createdBlog.title} by ${createdBlog.author} added`)
       setTimeout(() => setSuccessMessage(null), 5000)
     } catch (exception) {
@@ -73,7 +67,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
-        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}  {/* ← aquí */}
+        {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <form onSubmit={handleLogin}>
           <div>
@@ -93,34 +87,17 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}  {/* ← aquí */}
-      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}        {/* ← aquí */}
-
+      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
+      {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
       </p>
 
-      <h2>create new</h2>
-
       {formVisible
         ? <div>
-            <form onSubmit={handleCreate}>
-              <div>
-                title
-                <input type="text" value={title} onChange={({ target }) => setTitle(target.value)} />
-              </div>
-              <div>
-                author
-                <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)} />
-              </div>
-              <div>
-                url
-                <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} />
-              </div>
-              <button type="submit">create</button>
-              <button type="button" onClick={() => setFormVisible(false)}>cancel</button>
-            </form>
+            <BlogForm onCreate={handleCreate} />
+            <button onClick={() => setFormVisible(false)}>cancel</button>
           </div>
         : <button onClick={() => setFormVisible(true)}>create new blog</button>
       }
