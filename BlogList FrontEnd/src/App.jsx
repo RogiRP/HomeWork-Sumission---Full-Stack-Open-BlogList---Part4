@@ -52,7 +52,7 @@ const App = () => {
   const handleCreate = async (newBlog) => {
     try {
       const createdBlog = await blogService.create(newBlog)
-      setBlogs(blogs.concat(createdBlog))
+      setBlogs(blogs.concat({...createdBlog, user: { username: user.username, name: user.name }}))
       setFormVisible(false)
       setSuccessMessage(`a new blog ${createdBlog.title} by ${createdBlog.author} added`)
       setTimeout(() => setSuccessMessage(null), 5000)

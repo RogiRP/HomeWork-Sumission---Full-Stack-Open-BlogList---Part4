@@ -44,37 +44,56 @@ describe('Blog app', () => {
   })
 
   describe('When logged in', () => {
-  beforeEach(async ({ page }) => {
-    await page.getByRole('textbox', { name: 'username' }).fill('testuser')
-    await page.getByRole('textbox', { name: 'password' }).fill('password123')
-    await page.getByRole('button', { name: 'login' }).click()
-    await expect(page.getByText('Test User logged in')).toBeVisible()
-  })
+    beforeEach(async ({ page }) => {
+        await page.getByRole('textbox', { name: 'username' }).fill('testuser')
+        await page.getByRole('textbox', { name: 'password' }).fill('password123')
+        await page.getByRole('button', { name: 'login' }).click()
+        await expect(page.getByText('Test User logged in')).toBeVisible()
+    })
 
-  test('a new blog can be created', async ({ page }) => {
-    await page.getByRole('button', { name: 'create new blog' }).click()
-
-    await page.getByRole('textbox', { name: 'title' }).fill('E2E Test Blog')
-    await page.getByRole('textbox', { name: 'author' }).fill('E2E Author')
-    await page.getByRole('textbox', { name: 'url' }).fill('http://e2etest.com')
-
-    await page.getByRole('button', { name: 'create' }).click()
-
-    await expect(page.getByText('E2E Test Blog E2E Author')).toBeVisible()
-  })
-
-  test('a blog can be liked', async ({ page }) => {
+    test('a new blog can be created', async ({ page }) => {
         await page.getByRole('button', { name: 'create new blog' }).click()
-        await page.getByRole('textbox', { name: 'title' }).fill('Blog to like')
+
+        await page.getByRole('textbox', { name: 'title' }).fill('E2E Test Blog')
+        await page.getByRole('textbox', { name: 'author' }).fill('E2E Author')
+        await page.getByRole('textbox', { name: 'url' }).fill('http://e2etest.com')
+
+        await page.getByRole('button', { name: 'create' }).click()
+
+        await expect(page.getByText('E2E Test Blog E2E Author')).toBeVisible()
+    })
+
+    test('a blog can be liked', async ({ page }) => {
+            await page.getByRole('button', { name: 'create new blog' }).click()
+            await page.getByRole('textbox', { name: 'title' }).fill('Blog to like')
+            await page.getByRole('textbox', { name: 'author' }).fill('Test Author')
+            await page.getByRole('textbox', { name: 'url' }).fill('http://test.com')
+            await page.getByRole('button', { name: 'create' }).click()
+            await expect(page.getByText('Blog to like Test Author')).toBeVisible()
+
+            await page.getByRole('button', { name: 'view' }).click()
+            await expect(page.getByText('likes 0')).toBeVisible()
+            await page.getByRole('button', { name: 'like' }).click()
+            await expect(page.getByText('likes 1')).toBeVisible()
+        })
+    
+    test('the creator can delete a blog', async ({ page }) => {
+        await page.getByRole('button', { name: 'create new blog' }).click()
+        await page.getByRole('textbox', { name: 'title' }).fill('Blog to delete')
         await page.getByRole('textbox', { name: 'author' }).fill('Test Author')
         await page.getByRole('textbox', { name: 'url' }).fill('http://test.com')
         await page.getByRole('button', { name: 'create' }).click()
-        await expect(page.getByText('Blog to like Test Author')).toBeVisible()
+        await expect(page.getByText('Blog to delete Test Author')).toBeVisible()
 
-        await page.getByRole('button', { name: 'view' }).click()
-        await expect(page.getByText('likes 0')).toBeVisible()
-        await page.getByRole('button', { name: 'like' }).click()
-        await expect(page.getByText('likes 1')).toBeVisible()
+        const blogElement = page.locator('.blog').filter({ hasText: 'Blog to delete' })
+
+        await blogElement.getByRole('button', { name: 'view' }).click()
+        await expect(blogElement.getByRole('button', { name: 'remove' })).toBeVisible()
+
+        page.on('dialog', dialog => dialog.accept())
+        await blogElement.getByRole('button', { name: 'remove' }).click()
+
+        await expect(page.getByText('Blog to delete Test Author')).not.toBeVisible()
+        })
     })
-})
 })
