@@ -42,4 +42,25 @@ describe('Blog app', () => {
       await expect(page.getByText('Test User logged in')).not.toBeVisible()
     })
   })
+
+  describe('When logged in', () => {
+  beforeEach(async ({ page }) => {
+    await page.getByRole('textbox', { name: 'username' }).fill('testuser')
+    await page.getByRole('textbox', { name: 'password' }).fill('password123')
+    await page.getByRole('button', { name: 'login' }).click()
+    await expect(page.getByText('Test User logged in')).toBeVisible()
+  })
+
+  test('a new blog can be created', async ({ page }) => {
+    await page.getByRole('button', { name: 'create new blog' }).click()
+
+    await page.getByRole('textbox', { name: 'title' }).fill('E2E Test Blog')
+    await page.getByRole('textbox', { name: 'author' }).fill('E2E Author')
+    await page.getByRole('textbox', { name: 'url' }).fill('http://e2etest.com')
+
+    await page.getByRole('button', { name: 'create' }).click()
+
+    await expect(page.getByText('E2E Test Blog E2E Author')).toBeVisible()
+  })
+})
 })
