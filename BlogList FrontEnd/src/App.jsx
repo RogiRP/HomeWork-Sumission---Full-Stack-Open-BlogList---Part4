@@ -90,12 +90,12 @@ const App = () => {
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <form onSubmit={handleLogin}>
           <div>
-            username
-            <input type="text" value={username} onChange={({ target }) => setUsername(target.value)} />
+            <label htmlFor="username">username</label>
+            <input id="username" type="text" value={username} onChange={({ target }) => setUsername(target.value)} />
           </div>
           <div>
-            password
-            <input type="password" value={password} onChange={({ target }) => setPassword(target.value)} />
+            <label htmlFor="password">password</label>
+            <input id="password" type="password" value={password} onChange={({ target }) => setPassword(target.value)} />
           </div>
           <button type="submit">login</button>
         </form>
