@@ -126,5 +126,43 @@ describe('Blog app', () => {
         await blogElementOther.getByRole('button', { name: 'view' }).click()
         await expect(blogElementOther.getByRole('button', { name: 'remove' })).not.toBeVisible()
         })
+
+    test('blogs are ordered by likes, most likes first', async ({ page }) => {
+        const blogs = [
+            { title: 'Blog with 0 likes', author: 'Author A', url: 'http://a.com' },
+            { title: 'Blog with 2 likes', author: 'Author B', url: 'http://b.com' },
+            { title: 'Blog with 1 like', author: 'Author C', url: 'http://c.com' }
+        ]
+
+        for (const blog of blogs) {
+            await page.getByRole('button', { name: 'create new blog' }).click()
+            await page.getByRole('textbox', { name: 'title' }).fill(blog.title)
+            await page.getByRole('textbox', { name: 'author' }).fill(blog.author)
+            await page.getByRole('textbox', { name: 'url' }).fill(blog.url)
+            await page.getByRole('button', { name: 'create' }).click()
+            await expect(page.locator('.blog').filter({ hasText: blog.title })).toBeVisible()
+        }
+
+        const secondBlog = page.locator('.blog').filter({ hasText: 'Blog with 2 likes' })
+        await secondBlog.getByRole('button', { name: 'view' }).click()
+        await secondBlog.getByRole('button', { name: 'like' }).click()
+        await expect(secondBlog.getByText('likes 1')).toBeVisible()
+        await secondBlog.getByRole('button', { name: 'like' }).click()
+        await expect(secondBlog.getByText('likes 2')).toBeVisible()
+
+        const thirdBlog = page.locator('.blog').filter({ hasText: 'Blog with 1 like' })
+        await thirdBlog.getByRole('button', { name: 'view' }).click()
+        await thirdBlog.getByRole('button', { name: 'like' }).click()
+        await expect(thirdBlog.getByText('likes 1')).toBeVisible()
+
+        const blogElements = await page.locator('.blog').all()
+        const titles = await Promise.all(
+            blogElements.map(el => el.locator('.blog-summary').textContent())
+        )
+
+        expect(titles[0]).toContain('Blog with 2 likes')
+        expect(titles[1]).toContain('Blog with 1 like')
+        expect(titles[2]).toContain('Blog with 0 likes')
+        })
     })
 })
