@@ -62,5 +62,19 @@ describe('Blog app', () => {
 
     await expect(page.getByText('E2E Test Blog E2E Author')).toBeVisible()
   })
+
+  test('a blog can be liked', async ({ page }) => {
+        await page.getByRole('button', { name: 'create new blog' }).click()
+        await page.getByRole('textbox', { name: 'title' }).fill('Blog to like')
+        await page.getByRole('textbox', { name: 'author' }).fill('Test Author')
+        await page.getByRole('textbox', { name: 'url' }).fill('http://test.com')
+        await page.getByRole('button', { name: 'create' }).click()
+        await expect(page.getByText('Blog to like Test Author')).toBeVisible()
+
+        await page.getByRole('button', { name: 'view' }).click()
+        await expect(page.getByText('likes 0')).toBeVisible()
+        await page.getByRole('button', { name: 'like' }).click()
+        await expect(page.getByText('likes 1')).toBeVisible()
+    })
 })
 })
